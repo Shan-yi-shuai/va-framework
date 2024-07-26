@@ -8,8 +8,10 @@
 ```bash
 $ cd client
 
+# If you don't have pnpm installed, run: npm install -g pnpm
+
 # Install Dependencies
-$ pnpm i # If you don't have pnpm installed, run: npm install -g pnpm
+$ pnpm i
 
 # Compiles for development
 $ pnpm run dev

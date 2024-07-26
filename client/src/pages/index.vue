@@ -1,46 +1,119 @@
 <script setup lang="ts" generic="T extends any, O extends any">
+import { Icon } from '@iconify/vue'
+import { useStore } from '../stores/store'
+import TheVesselSelector from '~/components/TheVesselSelector.vue';
+import TheLocationSelector from '~/components/TheLocationSelector.vue';
+import TheCommoditySelector from '~/components/TheCommoditySelector.vue';
+import TheDateSelector from '~/components/TheDateSelector.vue';
+import TheVesselTypeLegend from '~/components/TheVesselTypeLegend.vue';
+import TheVesselTSNE from '~/components/TheVesselTSNE.vue';
+
 defineOptions({
   name: 'IndexPage',
 })
 
-const name = ref('')
+const store = useStore()
 
-const router = useRouter()
-function go() {
-  if (name.value)
-    router.push(`/hi/${encodeURIComponent(name.value)}`)
-}
+onMounted(() => {
+  store.initialize()
+})
+
+const vesselTSNEContainer = ref(null)
+const vesselTSNEWidth = ref(0)
+const vesselTSNEHeight = ref(0)
+
+const vesselMovementContainer = ref(null)
+const vesselMovementWidth = ref(0)
+const vesselMovementHeight = ref(0)
+
+const aggregatedVesselMovementViewContainer = ref(null)
+const aggregatedVesselMovementViewWidth = ref(0)
+const aggregatedVesselMovementViewHeight = ref(0)
+
+onMounted(() => {
+  if (vesselTSNEContainer.value) {
+    const observer = new ResizeObserver(entries => {
+      for (let entry of entries) {
+        if (entry.target === vesselTSNEContainer.value) {
+          const rect = entry.contentRect
+          vesselTSNEWidth.value = rect.width
+          vesselTSNEHeight.value = rect.height
+        }
+      }
+    })
+    observer.observe(vesselTSNEContainer.value)
+  }
+
+  if (vesselMovementContainer.value) {
+    const observer = new ResizeObserver(entries => {
+      for (let entry of entries) {
+        if (entry.target === vesselMovementContainer.value) {
+          const rect = entry.contentRect
+          vesselMovementWidth.value = rect.width
+          vesselMovementHeight.value = rect.height
+        }
+      }
+    })
+    observer.observe(vesselMovementContainer.value)
+  }
+
+  if (aggregatedVesselMovementViewContainer.value) {
+    const observer = new ResizeObserver(entries => {
+      for (let entry of entries) {
+        if (entry.target === aggregatedVesselMovementViewContainer.value) {
+          const rect = entry.contentRect
+          aggregatedVesselMovementViewWidth.value = rect.width
+          aggregatedVesselMovementViewHeight.value = rect.height
+        }
+      }
+    })
+    observer.observe(aggregatedVesselMovementViewContainer.value)
+  }
+})
 </script>
 
 <template>
-  <div>
-    <div i-carbon-campsite inline-block text-4xl />
-    <p>
-      <a rel="noreferrer" href="https://github.com/antfu/vitesse-lite" target="_blank">
-        Vitesse Lite
-      </a>
-    </p>
-    <p>
-      <em text-sm op75>Opinionated Vite Starter Template</em>
-    </p>
+  <div class="w-full h-26 border-2 border-slate-200 m-1">
+    <div class="h-6 w-full flex  bg-white gap-2">
+      <TheVesselSelector />
+      <TheLocationSelector />
+      <TheCommoditySelector />
+      <TheDateSelector />
+    </div>
+    <div class="mx-1 h-6 w-[calc(100%-0.5rem)] flex border-1 border-slate-50 bg-white p-1">
+      <TheVesselTypeLegend />
+    </div>
+    <div class="mx-1 h-12 w-[calc(100%-0.5rem)] flex border-1 border-slate-50 bg-white p-1">
+      <TheLocationLegend />
+    </div>
+  </div>
 
-    <div py-4 />
-
-    <TheInput
-      v-model="name"
-      placeholder="What's your name?"
-      autocomplete="false"
-      @keydown.enter="go"
-    />
-
-    <div>
-      <button
-        class="m-3 text-sm btn"
-        :disabled="!name"
-        @click="go"
-      >
-        Go
-      </button>
+  <div class="h-[calc(100%-6.5rem)] w-full flex border-2 border-slate-200 bg-slate-100 gap-4 m-1 ">
+    <div class="h-full w-50% bg-white px-2">
+      <div class="w-full h-6 flex border-b-2">
+        <div class="w-8 h-full flex items-center justify-center">
+          <Icon icon="vaadin:cluster" />
+        </div>
+        <div class="">Cluster View</div>
+      </div>
+      <div class="h-[calc(100%-1.5rem)] w-full bg-white" ref="vesselTSNEContainer">
+        <TheVesselTSNE :width="vesselTSNEWidth" :height="vesselTSNEHeight" />
+      </div>
+    </div>
+    <div class="h-full w-50% bg-white px-2">
+      <div class="w-full h-6 flex border-b-2">
+        <div class="w-8 h-full flex items-center justify-center">
+          <Icon icon="icon-park-outline:timeline" />
+        </div>
+        <div class="">Timeline View</div>
+      </div>
+      <div class="h-[calc(70%-1.5rem)] w-full bg-white " ref="vesselMovementContainer">
+        <TheVesselMovementView :width="vesselMovementWidth" :height="vesselMovementHeight" />
+      </div>
+      <div class="h-30% w-full bg-white " ref="aggregatedVesselMovementViewContainer">
+        <TheAggregatedVesselMovementView :width="aggregatedVesselMovementViewWidth"
+          :height="aggregatedVesselMovementViewHeight" />
+      </div>
     </div>
   </div>
 </template>

@@ -11,9 +11,13 @@
     "up": "taze major -I"
   },
   "dependencies": {
+    "@iconify/vue": "^4.1.2",
     "@vueuse/core": "^10.1.2",
     "axios": "^1.4.0",
+    "d3": "^7.9.0",
+    "element-plus": "^2.7.6",
     "pinia": "^2.1.6",
+    "sass": "^1.77.8",
     "vue": "^3.3.4",
     "vue-router": "^4.2.2"
   },
