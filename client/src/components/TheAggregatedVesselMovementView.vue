@@ -15,12 +15,13 @@ const {
 
 // acquire pinia store
 const store = useStore()
-const { vesselMovements, aggregatedVesselMovements, selectedLocationIDs, selectedCommodityIDs, dateInterval, focusVesselID, vesselTypeColor, locationColor, vesselID2Name, locationID2Name } = storeToRefs(store)
+const { vesselMovements, aggregatedVesselMovements, dateInterval, focusVesselID, vesselTypeColor, locationColor, vesselID2Name, locationID2Name } = storeToRefs(store)
 
 function renderChart(vesselMovements: any, aggregatedVesselMovements: any, focusVesselID: any, dateInterval: any): void {
   const vesselMovementsCopy = JSON.parse(JSON.stringify(vesselMovements))
   const focusVesselMovementsCopy = vesselMovementsCopy.filter((d: any) => d.vessel_id === focusVesselID)
-  const combinedData = [...aggregatedVesselMovements, ...focusVesselMovementsCopy]
+  const aggregatedVesselMovementsCopy = JSON.parse(JSON.stringify(aggregatedVesselMovements))
+  const combinedData = [...aggregatedVesselMovementsCopy, ...focusVesselMovementsCopy]
 
   const parseDate = d3.timeParse('%Y-%m-%dT%H:%M:%S')
 
@@ -47,7 +48,7 @@ function renderChart(vesselMovements: any, aggregatedVesselMovements: any, focus
     .range([0, _width - 40])
 
   const yVessel = d3.scaleBand()
-    .domain(combinedData.map((d: { vessel_id: string; vessel_type: string }) => d.vessel_id))
+    .domain(['aggregation', focusVesselID])
     .range([0, _height - 10])
     .padding(0.1)
 
@@ -159,14 +160,11 @@ function renderChart(vesselMovements: any, aggregatedVesselMovements: any, focus
     .call(brushX)
 }
 
-watch([vesselMovements, aggregatedVesselMovements, focusVesselID, selectedLocationIDs, selectedCommodityIDs, dateInterval], ([newVesselMovements, newAggregatedVesselMovements, newFocusVesselID, newSelectedVesselIDs, newSelectedLocationIDs, newDateInterval]) => {
+watch([vesselMovements, aggregatedVesselMovements, focusVesselID], ([newVesselMovements, newAggregatedVesselMovements, newFocusVesselID]) => {
   if (newVesselMovements.length > 0
-    && newSelectedVesselIDs.length > 0
-    && newSelectedLocationIDs.length > 0
-    && d3.timeParse('%Y-%m-%d')('2035-2-1') <= d3.timeParse('%Y-%m-%d')(newDateInterval[0])
-    && d3.timeParse('%Y-%m-%d')(newDateInterval[1]) <= d3.timeParse('%Y-%m-%d')('2035-12-31')
+    && newAggregatedVesselMovements.length > 0
   )
-    renderChart(newVesselMovements, newAggregatedVesselMovements, newFocusVesselID, newDateInterval)
+    renderChart(newVesselMovements, newAggregatedVesselMovements, newFocusVesselID, dateInterval.value)
 }, { immediate: true })
 </script>
 

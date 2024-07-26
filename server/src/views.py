@@ -28,8 +28,14 @@ def get_vessel_movements():
     post_data = json.loads(post_data)
     start_date = post_data["start_date"]
     end_date = post_data["end_date"]
-    vessel_ids = post_data["vessel_ids"]
     location_ids = post_data["location_ids"]
-    vessel_movements = model.get_vessel_movements(start_date, end_date, vessel_ids, location_ids)
-    aggregated_vessel_movements = model.get_aggregate_vessel_movements()
-    return json.dumps({"vessel_movements": vessel_movements, "aggregated_vessel_movements": aggregated_vessel_movements})
+
+    return model.get_vessel_movements(start_date, end_date, location_ids)
+
+@app.route('/get_aggregated_vessel_movements', methods=['POST'])
+def get_aggregated_vessel_movements():
+    post_data = request.data.decode()
+    post_data = json.loads(post_data)
+    vessel_ids = post_data["vessel_ids"]
+
+    return model.get_aggregated_vessel_movements(vessel_ids)

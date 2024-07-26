@@ -15,7 +15,7 @@
 <script lang="ts" setup>
 import { storeToRefs } from 'pinia'
 import { ref, watch, computed } from 'vue'
-import type { CheckboxValueType } from 'element-plus'
+// import type { CheckboxValueType } from 'element-plus'
 import { useStore } from '../stores/store'
 
 const store = useStore()
@@ -28,7 +28,7 @@ const checkedTypes = ref<{ [key: string]: boolean }>({})
 const indeterminate = ref<{ [key: string]: boolean }>({})
 const value = computed({
     get: () => selectedLocationIDs.value.map(id => locationID2Name.value[id]),
-    set: (val: CheckboxValueType[]) => {
+    set: (val: string[]) => {
         selectedLocationIDs.value = val.map(name => locationName2ID.value[name])
     }
 })
@@ -98,12 +98,13 @@ const handleSelectBlur = () => {
     // Handle select blur event if needed
 }
 
-watch(filteredData, (filteredItems) => {
-    const selectedItems = value.value.filter(val => !filteredItems.some(item => item.id === val))
-    if (selectedItems.length !== value.value.length) {
-        value.value = selectedItems
-    }
-})
+// watch(filteredData, (filteredItems) => {
+//     const selectedItems = value.value.filter(val => !filteredItems.some(item => item.Name === val))
+//     if (selectedItems.length !== value.value.length) {
+//         value.value = selectedItems
+//         console.log(value.value)
+//     }
+// })
 </script>
 
 <style lang="scss">

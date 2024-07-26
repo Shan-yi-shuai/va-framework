@@ -154,8 +154,8 @@ export const useStore = defineStore({
         this.selectedVesselIDs = this.vessels.map((node: any) => node.id)
         this.selectedLocationIDs = this.locations.map((node: any) => node.id)
         this.selectedCommodityIDs = this.commodities.map((node: any) => node.id)
-        this.getVesselTSNE()
-        this.getVesselMovements()
+        // this.getVesselTSNE()
+        // this.getVesselMovements()
       })
     },
     getVesselTSNE() {
@@ -164,9 +164,13 @@ export const useStore = defineStore({
       })
     },
     getVesselMovements() {
-      this.post('get_vessel_movements', { start_date: this.dateInterval[0], end_date: this.dateInterval[1], vessel_ids: this.selectedVesselIDs, location_ids: this.selectedLocationIDs }, (data: { vessel_movements: VesselMovement[]; aggregated_vessel_movements: VesselMovement[] }) => {
-        this.vesselMovements = data.vessel_movements
-        this.aggregatedVesselMovements = data.aggregated_vessel_movements
+      this.post('get_vessel_movements', { start_date: this.dateInterval[0], end_date: this.dateInterval[1], vessel_ids: this.selectedVesselIDs, location_ids: this.selectedLocationIDs }, (data: VesselMovement[]) => {
+        this.vesselMovements = data
+      })
+    },
+    getAggregatedVesselMovements() {
+      this.post('get_aggregated_vessel_movements', { start_date: this.dateInterval[0], end_date: this.dateInterval[1], vessel_ids: this.selectedVesselIDs, location_ids: this.selectedLocationIDs }, (data: VesselMovement[]) => {
+        this.aggregatedVesselMovements = data
       })
     },
   },

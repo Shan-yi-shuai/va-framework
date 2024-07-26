@@ -51,6 +51,7 @@ class Model:
             print(f'could not open: {FILE_DATA_JSON} because {e}')
 
         self.date_movements = self.get_date_movements()
+        self.filtered_movements = []
 
     def get_events(self, event_type):
         return pd.DataFrame([event for event in self.events if event['type'] == event_type])
@@ -179,7 +180,7 @@ class Model:
     def get_all_entities(self):
         return json.dumps(self.entities)
 
-    def get_vessel_movements(self, start_date, end_date, vessel_ids, location_ids):
+    def get_vessel_movements(self, start_date, end_date, location_ids):
         df_transport_events = pd.DataFrame(
             self.get_events(EVENT_TYPES['transport_event'])
         )
@@ -212,7 +213,6 @@ class Model:
                 columns={'source': 'location_id', 'target': 'vessel_id'})
 
             filtered_movements = df_transport_events_rename[
-                (df_transport_events_rename['vessel_id'].isin(vessel_ids)) &
                 (df_transport_events_rename['location_id'].isin(location_ids)) &
                 (df_transport_events_rename['end_time'] > start) &
                 (df_transport_events_rename['start_time'] < end)
@@ -224,12 +224,13 @@ class Model:
                     '%Y-%m-%dT%H:%M:%S')
             )
             self.filtered_movements = filtered_movements[[
-                'start_time', 'end_time', 'location_id', 'vessel_id']]
+                'start_time', 'end_time', 'location_id', 'vessel_id']].to_dict(orient='records')
 
-        return self.filtered_movements.to_dict(orient='records')
+        return json.dumps(self.filtered_movements)
 
-    def get_aggregate_vessel_movements(self):
-        df = self.filtered_movements
+    def get_aggregated_vessel_movements(self, vessel_ids):
+        df = pd.DataFrame(self.filtered_movements)
+        df = df.loc[df['vessel_id'].isin(vessel_ids)]
         # 转换时间列为datetime格式
         df['start_time'] = pd.to_datetime(df['start_time'])
         df['end_time'] = pd.to_datetime(df['end_time'])

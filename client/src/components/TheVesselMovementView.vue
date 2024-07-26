@@ -15,10 +15,10 @@ const {
 
 // acquire pinia store
 const store = useStore()
-const { vesselMovements, selectedVesselIDs, selectedLocationIDs, selectedCommodityIDs, dateInterval, vesselID2Vessel, focusVesselID, vesselTypeColor, locationColor, vesselID2Name, locationID2Name } = storeToRefs(store)
+const { vesselMovements, selectedVesselIDs, dateInterval, vesselID2Vessel, focusVesselID, vesselTypeColor, locationColor, vesselID2Name, locationID2Name } = storeToRefs(store)
 
 function renderChart(vesselMovements: any, focusVesselID: any, selectedVesselIDs: any, dateInterval: any): void {
-  const vesselMovementsCopy = JSON.parse(JSON.stringify(vesselMovements))
+  const vesselMovementsCopy = JSON.parse(JSON.stringify(vesselMovements)).filter((d: any) => selectedVesselIDs.includes(d.vessel_id))
 
   const parseDate = d3.timeParse('%Y-%m-%dT%H:%M:%S')
 
@@ -111,7 +111,7 @@ function renderChart(vesselMovements: any, focusVesselID: any, selectedVesselIDs
       .attr('height', yVessel.bandwidth())
       .attr('fill', 'none')
       .attr('stroke', 'black')
-      .attr('stroke-width', 0.5)
+      .attr('stroke-width', 1)
   }
 
   svg.selectAll('.vessel')
@@ -183,15 +183,11 @@ function renderChart(vesselMovements: any, focusVesselID: any, selectedVesselIDs
     .call(brushX)
 }
 
-watch([vesselMovements, focusVesselID, selectedVesselIDs, selectedLocationIDs, selectedCommodityIDs, dateInterval], ([newVesselMovements, newFocusVesselID, newSelectedVesselIDs, newSelectedLocationIDs, newSelectedCommodityIDs, newDateInterval]) => {
+watch([vesselMovements, focusVesselID, selectedVesselIDs], ([newVesselMovements, newFocusVesselID, newSelectedVesselIDs]) => {
   if (newVesselMovements.length > 0
     && newSelectedVesselIDs.length > 0
-    && newSelectedLocationIDs.length > 0
-    && newSelectedCommodityIDs.length > 0
-    && d3.timeParse('%Y-%m-%d')('2035-2-1') <= d3.timeParse('%Y-%m-%d')(newDateInterval[0])
-    && d3.timeParse('%Y-%m-%d')(newDateInterval[1]) <= d3.timeParse('%Y-%m-%d')('2035-12-31')
   )
-    renderChart(newVesselMovements, newFocusVesselID, newSelectedVesselIDs, newDateInterval)
+    renderChart(newVesselMovements, newFocusVesselID, newSelectedVesselIDs, dateInterval.value)
 }, { immediate: true })
 </script>
 

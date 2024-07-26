@@ -1,4 +1,5 @@
 <script setup lang="ts" generic="T extends any, O extends any">
+import { storeToRefs } from 'pinia'
 import { Icon } from '@iconify/vue'
 import { useStore } from '../stores/store'
 import TheVesselSelector from '~/components/TheVesselSelector.vue';
@@ -13,11 +14,30 @@ defineOptions({
 })
 
 const store = useStore()
+const { vesselMovements, selectedVesselIDs, dateInterval, selectedLocationIDs } = storeToRefs(store)
 
+// 系统初始化
 onMounted(() => {
   store.initialize()
 })
 
+// 监听变量
+watch([selectedLocationIDs, dateInterval], ([newSelectedLocationIDs, newDateInterval]) => {
+  if (newSelectedLocationIDs.length > 0
+    && new Date('2035-2-1') <= new Date(newDateInterval[0])
+    && new Date(newDateInterval[1]) <= new Date('2035-12-31')
+  )
+    store.getVesselMovements()
+}, { immediate: true })
+
+watch([vesselMovements, selectedVesselIDs], ([newVesselMovements, newSelectedVesselIDs]) => {
+  if (newVesselMovements.length > 0
+    && newSelectedVesselIDs.length > 0
+  )
+    store.getAggregatedVesselMovements()
+}, { immediate: true })
+
+// 动态布局
 const vesselTSNEContainer = ref(null)
 const vesselTSNEWidth = ref(0)
 const vesselTSNEHeight = ref(0)
