@@ -25,8 +25,11 @@ $ cd server
 # Creating a Virtual Environment
 $ python3 -m venv .venv
 
-#Activating the virtual environment
-$ . .venv/bin/activate
+# Activating the virtual environment (Mac/Linux)
+$ source .venv/bin/activate
+
+# Activating the virtual environment (Windows)
+$ .venv\Scripts\activate
 
 # Install Dependencies
 $ pip3 install -r requirements.txt

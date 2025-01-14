@@ -1,6 +1,5 @@
 import os
 import json
-from syslog import syslog
 import pandas as pd
 import json
 from datetime import datetime, timedelta
